@@ -1,3 +1,4 @@
+# API docs at https://pushover.net/api
 # Templates from https://support.pushover.net/i44-example-code-and-pushover-libraries#python
 
 # Simple text notification
