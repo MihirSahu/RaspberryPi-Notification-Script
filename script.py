@@ -1,42 +1,43 @@
 import http.client, urllib
 import datetime
 import time
+import subprocess
 
-conn = http.client.HTTPSConnection("api.pushover.net:443")
-
+# Used to save last check
 lastCheck = datetime.datetime.now().minute
 
-while True:
-	# Testing
-	#print(str(lastCheck) + " " + str((datetime.datetime.now().minute + 1) % 60))
+# Functions
+def sendNotification(title, message):
+	conn = http.client.HTTPSConnection("api.pushover.net:443")
+	conn.request("POST", "/1/messages.json",
 
-	"""
-	if datetime.datetime.now().minute == (lastCheck + 5) % 60:
-		conn.request("POST", "/1/messages.json",
-		
-		  urllib.parse.urlencode({
-		    "token": "",
-		    "user": "",
-		    "title": "Testing",
-		    "message": f"The minute is {datetime.datetime.now().minute}",
-		  }), { "Content-type": "application/x-www-form-urlencoded" })
-		
-		print(conn.getresponse().read())
+	  urllib.parse.urlencode({
+	    "token": "",
+	    "user": "",
+	    "title": title,
+	    "message": message,
+	  }), { "Content-type": "application/x-www-form-urlencoded" })
 
-		lastCheck = (lastCheck + 1) % 60
-	"""
+	print(conn.getresponse().read())
 
-	if (datetime.datetime.now().hour == 23) and (datetime.datetime.now().minute == 59):
-		conn.request("POST", "/1/messages.json",
-		
-		  urllib.parse.urlencode({
-		    "token": "",
-		    "user": "",
-		    "title": "Go to sleep!",
-		    "message": f"It's 12:00! Go to sleep or you'll regret it :p",
-		  }), { "Content-type": "application/x-www-form-urlencoded" })
-		
-		print(conn.getresponse().read())
-		time.sleep(60 - datetime.datetime.now().second)
-	else:
-		time.sleep((abs(datetime.datetime.now().hour - 23) * 60 * 60) + (abs(datetime.datetime.now().minute - 59) * 60) + (abs(datetime.datetime.now().second - 50)))
+async def sleepNotification():
+	while True:
+		if (datetime.datetime.now().hour == 23) and (datetime.datetime.now().minute == 59):
+			await sendNotification("Go to sleep!", "It's 12:00! Go to sleep or you'll regret it tomorrow :p")
+			await time.sleep(60 - datetime.datetime.now().second)
+		else:
+			await time.sleep((abs(datetime.datetime.now().hour - 23) * 60 * 60) + (abs(datetime.datetime.now().minute - 59) * 60) + (abs(datetime.datetime.now().second - 50)))
+
+async def tempNotification():
+	while True:
+		if ((lastCheck + 10) % 60) == (datetime.datetime.now().minute):
+			lastCheck = datetime.datetime.now().minute
+			temp = str(subprocess.check_output("/opt/vc/bin/vcgencmd measure_temp", shell=True)).rstrip()
+			if float(temp[(temp.find('=') + 1):(temp.find("'"))]) > 50:
+				await sendNotification("High Temperature Warning", "Raspberry Pi temperature is over 50 degrees Celcius!")
+		else:
+			time.sleep(570)
+
+# Run
+await sleepNotification()
+await tempNotification()
