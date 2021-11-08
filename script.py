@@ -1,5 +1,6 @@
 import http.client, urllib
 import datetime
+import time
 
 conn = http.client.HTTPSConnection("api.pushover.net:443")
 
@@ -37,3 +38,5 @@ while True:
 		
 		print(conn.getresponse().read())
 		time.sleep(60 - datetime.datetime.now().second)
+	else:
+		time.sleep((abs(datetime.datetime.now().hour - 23) * 60 * 60) + (abs(datetime.datetime.now().minute - 59) * 60) + (abs(datetime.datetime.now().second - 50)))
