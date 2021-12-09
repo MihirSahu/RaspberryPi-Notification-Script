@@ -1,10 +1,8 @@
+#!/usr/bin/python3
+
 import http.client, urllib
 import datetime
-import time
 import subprocess
-
-# Used to save last check
-lastCheck = datetime.datetime.now().minute
 
 # Functions
 def sendNotification(title, message):
@@ -20,24 +18,15 @@ def sendNotification(title, message):
 
 	print(conn.getresponse().read())
 
-async def sleepNotification():
-	while True:
-		if (datetime.datetime.now().hour == 23) and (datetime.datetime.now().minute == 59):
-			await sendNotification("Go to sleep!", "It's 12:00! Go to sleep or you'll regret it tomorrow :p")
-			await time.sleep(60 - datetime.datetime.now().second)
-		else:
-			await time.sleep((abs(datetime.datetime.now().hour - 23) * 60 * 60) + (abs(datetime.datetime.now().minute - 59) * 60) + (abs(datetime.datetime.now().second - 50)))
+def sleepNotification():
+	if (datetime.datetime.now().hour >= 0) and (datetime.datetime.now().hour <= 3):
+		sendNotification("Go to sleep!", "Go to sleep or you'll regret it tomorrow :p")
 
-async def tempNotification():
-	while True:
-		if ((lastCheck + 10) % 60) == (datetime.datetime.now().minute):
-			lastCheck = datetime.datetime.now().minute
-			temp = str(subprocess.check_output("/opt/vc/bin/vcgencmd measure_temp", shell=True)).rstrip()
-			if float(temp[(temp.find('=') + 1):(temp.find("'"))]) > 50:
-				await sendNotification("High Temperature Warning", "Raspberry Pi temperature is over 50 degrees Celcius!")
-		else:
-			time.sleep(570)
+def tempNotification():
+	temp = str(subprocess.check_output("/opt/vc/bin/vcgencmd measure_temp", shell=True)).rstrip()
+	if float(temp[(temp.find('=') + 1):(temp.find("'"))]) > 50:
+		sendNotification("High Temperature Warning", "Raspberry Pi temperature is over 50 degrees Celcius!")
 
 # Run
-await sleepNotification()
-await tempNotification()
+sleepNotification()
+tempNotification()
