@@ -19,13 +19,23 @@ def sendNotification(title, message):
 	print(conn.getresponse().read())
 
 def sleepNotification():
-	if (datetime.datetime.now().hour >= 0) and (datetime.datetime.now().hour <= 3):
-		sendNotification("Go to sleep!", "Go to sleep or you'll regret it tomorrow :p")
+	with open('flag.txt', 'r') as file:
+		sentMessage = file.readline().strip()
+		if sentMessage == "False":
+			if (datetime.datetime.now().hour >= 0) and (datetime.datetime.now().hour <= 3):
+				sendNotification("Go to sleep!", "Go to sleep or you'll regret it tomorrow :p")
+				with open('flag.txt', 'w') as file:
+					file.write("True")
+			else:
+				with open('flag.txt', 'w') as file:
+					file.write("False")
 
 def tempNotification():
 	temp = str(subprocess.check_output("/opt/vc/bin/vcgencmd measure_temp", shell=True)).rstrip()
 	if float(temp[(temp.find('=') + 1):(temp.find("'"))]) > 50:
 		sendNotification("High Temperature Warning", "Raspberry Pi temperature is over 50 degrees Celcius!")
+		with open('logs.txt', 'a') as file:
+			file.write(str(datetime.datetime.now()) + '\n')
 
 # Run
 sleepNotification()
