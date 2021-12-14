@@ -20,18 +20,10 @@ def sendNotification(title, message):
 
 	print(conn.getresponse().read())
 
-# Remind me to sleep between 12AM and 3AM. A flag.txt is used to ensure that it doesn't keep sending the message every 10 minutes
+# Remind me to sleep between 12AM and 3AM
 def sleepNotification():
-	with open('flag.txt', 'r') as file:
-		sentMessage = file.readline().strip()
-		if sentMessage == "False":
-			if (datetime.datetime.now().hour >= 0) and (datetime.datetime.now().hour <= 3):
-				sendNotification("Go to sleep!", "Go to sleep or you'll regret it tomorrow :p")
-				with open('flag.txt', 'w') as file:
-					file.write("True")
-			else:
-				with open('flag.txt', 'w') as file:
-					file.write("False")
+	if (datetime.datetime.now().hour >= 0) and (datetime.datetime.now().hour <= 3):
+		sendNotification("Go to sleep!", "Go to sleep or you'll regret it tomorrow :p")
 
 # Notify me if the raspberry pi temp gets too high. Logs temp and time on logs.txt
 def tempNotification():
@@ -48,10 +40,13 @@ def todoNotification():
 
         for idx, date in enumerate(list(file["Date"])):
                 if date.date().strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d"):
+                        print("Same date")
                         time = list(file["Time"])[idx]
-                        if (time.hour <= datetime.datetime.now().hour) and (time.minute < datetime.datetime.now().minute):
-                                if (((datetime.datetime.now().hour - time,hour)*60) + (datetime.datetime.now().minute - time.minute)) < 30:
-                                        sendNotification(list(file["To-Do"])[idx])
+                        if (datetime.datetime.now().hour <= time.hour) and (datetime.datetime.now().minute <= time.minute):
+                                print("Same time")
+                                if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 30:
+                                        sendNotification(list(file["To-Do"])[idx], "Testing")
+                                        print("Message sent")
 
 # Run
 sleepNotification()

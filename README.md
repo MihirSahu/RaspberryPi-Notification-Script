@@ -12,3 +12,7 @@ This script allows me to send notifications to my phone through the [Pushover](h
 
 ## ToDo Notification
 The sleep notification and the temperature notification functions are pretty simple, but the todo notification needs some clarification. My goal with the todo notification function was to make the program download a copy or retrieve the data from an online excel/spreadsheet file - which would contain all my events, dates, and times - that I edited from any device and then notify me whenever I have some event coming up. I tried to do this with Office 365, but using the sharepoint api was too complicated. I then tried to use Google Drive's api, but that was overly complicated as well. I finally just settled on publishing the excel file to the web - which just means allowing anyone who has the link to download the file (to achieve this simply go to File > Share > Publish To Web > Link and choose the format that you want to share it as. I chose .xlsx because it's the easiest to work with) - and worked with that.
+
+## To-Do List Template
+- The To-Do list should be in this form:
+![Template](Images/Template.png)
