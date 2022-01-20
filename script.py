@@ -42,9 +42,9 @@ def todoNotification():
                 if date.date().strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d"):
                         print("Same date")
                         time = list(file["Time"])[idx]
-                        if (datetime.datetime.now().hour <= time.hour) and (datetime.datetime.now().minute <= time.minute):
+                        if (datetime.datetime.now().hour <= time.hour):
                                 print("Same time")
-                                if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 30:
+                                if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 60:
                                         sendNotification(list(file["To-Do"])[idx], "Testing")
                                         print("Message sent")
 
