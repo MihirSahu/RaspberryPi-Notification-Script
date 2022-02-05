@@ -39,14 +39,23 @@ def todoNotification():
         file = pandas.read_excel('To-Do.xlsx')
 
         for idx, date in enumerate(list(file["Date"])):
-                if date.date().strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d"):
-                        print("Same date")
-                        time = list(file["Time"])[idx]
-                        if (datetime.datetime.now().hour <= time.hour):
-                                print("Same time")
-                                if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 60:
-                                        sendNotification(list(file["To-Do"])[idx], "Testing")
-                                        print("Message sent")
+                if list(file["Completion"])[idx] == "N":
+                        if date.date().strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d"):
+                                #print("Same date")
+                                timeDue = list(file["Time Due"])[idx]
+                                notifyTime = list(file["Notification Time"])[idx]
+                                if (datetime.datetime.now().hour >= notifyTime.hour) and (datetime.datetime.now().hour <= timeDue.hour):
+                                        #print("Same time")
+                                        comment = list(file["Comment"])[idx]
+                                        sendNotification(list(file["To-Do"])[idx], comment + f'Due at {timeDue}')
+                                        '''
+                                        if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 60:
+                                                sendNotification(list(file["To-Do"])[idx], "Testing")
+                                                #print("Message sent")
+                                        '''
+                                elif (datetime.datetime.now().hour >= notifyTime.hour) and (timeDue.hour == 0) and (datetime.datetime.now().hour <= 24):
+                                        comment = list(file["Comment"])[idx]
+                                        sendNotification(list(file["To-Do"])[idx], comment + f'Due at {timeDue}')
 
 # Run
 sleepNotification()
