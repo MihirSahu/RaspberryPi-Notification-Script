@@ -5,7 +5,6 @@ import urllib.request
 import datetime
 import subprocess
 import pandas
-import multiprocessing
 
 # Functions
 def sendNotification(title, message):
@@ -64,8 +63,4 @@ def main():
         todoNotification()
 
 
-# Run program and kill it if it takes longer than 60 seconds
-p = multiprocessing.Process(target=main, name=mainScript)
-time.sleep(60)
-p.terminate()
-p.join()
+main()
