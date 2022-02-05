@@ -5,6 +5,7 @@ import urllib.request
 import datetime
 import subprocess
 import pandas
+import multiprocessing
 
 # Functions
 def sendNotification(title, message):
@@ -47,7 +48,7 @@ def todoNotification():
                                 if (datetime.datetime.now().hour >= notifyTime.hour) and (datetime.datetime.now().hour <= timeDue.hour):
                                         #print("Same time")
                                         comment = list(file["Comment"])[idx]
-                                        sendNotification(list(file["To-Do"])[idx], comment + f'Due at {timeDue}')
+                                        sendNotification(list(file["To-Do"])[idx], comment + f' Due at {timeDue.strftime("%I:%M")}')
                                         '''
                                         if (((time.hour - datetime.datetime.now().hour)*60) + (time.minute - datetime.datetime.now().minute)) <= 60:
                                                 sendNotification(list(file["To-Do"])[idx], "Testing")
@@ -55,9 +56,16 @@ def todoNotification():
                                         '''
                                 elif (datetime.datetime.now().hour >= notifyTime.hour) and (timeDue.hour == 0) and (datetime.datetime.now().hour <= 24):
                                         comment = list(file["Comment"])[idx]
-                                        sendNotification(list(file["To-Do"])[idx], comment + f'Due at {timeDue}')
+                                        sendNotification(list(file["To-Do"])[idx], comment + f' Due at {timeDue.strftime("%I:%M")}')
 
-# Run
-sleepNotification()
-tempNotification()
-todoNotification()
+def main():
+        sleepNotification()
+        tempNotification()
+        todoNotification()
+
+
+# Run program and kill it if it takes longer than 60 seconds
+p = multiprocessing.Process(target=main, name=mainScript)
+time.sleep(60)
+p.terminate()
+p.join()
